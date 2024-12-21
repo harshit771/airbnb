@@ -10,4 +10,7 @@ public interface HotelService {
 
     HotelDto updateHotelById(Long id,HotelDto hotelDto);
 
+    void deleteHotelById(Long id);
+
+
 }

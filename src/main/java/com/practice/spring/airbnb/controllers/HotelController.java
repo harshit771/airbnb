@@ -2,6 +2,7 @@ package com.practice.spring.airbnb.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,11 +34,8 @@ public class HotelController {
     @GetMapping("/{id}")
     public ResponseEntity<HotelDto> getHotelById(@PathVariable Long id){
         HotelDto hotel=hotelService.getHotelById(id);
-        if(hotel == null){
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }else{
-            return new ResponseEntity<>(hotel,HttpStatus.OK);
-        }
+        return new ResponseEntity<>(hotel,HttpStatus.OK);
+        
     }
 
     @PutMapping("/{hotelId}")
@@ -46,5 +44,11 @@ public class HotelController {
         return new ResponseEntity<>(hotelDto2,HttpStatus.OK);
 
     }
+
+    @DeleteMapping("/{hotelId}")
+    public void deleteHotelById(@PathVariable Long hotelId){
+        hotelService.deleteHotelById(hotelId);
+    }
+
 
 }
