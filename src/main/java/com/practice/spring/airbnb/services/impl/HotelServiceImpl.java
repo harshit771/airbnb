@@ -1,7 +1,4 @@
 package com.practice.spring.airbnb.services.impl;
-
-import java.util.Optional;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -39,5 +36,18 @@ public class HotelServiceImpl implements HotelService{
                       
         return modelMapper.map(hotel,HotelDto.class);
     }
+
+    @Override
+    public HotelDto updateHotelById(Long id, HotelDto hotelDto) {
+        Hotel hotel = hotelRepository.findById(id)
+                      .orElseThrow(() -> new ResourceAccessException("Hotel not found with id "+id));
+        modelMapper.map(hotelDto, hotel);
+        hotel.setId(id);
+        Hotel updateHotel = hotelRepository.save(hotel);
+        return modelMapper.map(updateHotel, HotelDto.class);
+
+    }
+
+    
 
 }
