@@ -1,5 +1,7 @@
 package com.practice.spring.airbnb.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.practice.spring.airbnb.dto.HotelDto;
 import com.practice.spring.airbnb.services.HotelService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,7 +29,7 @@ public class HotelController {
 
   
     @PostMapping
-    public ResponseEntity<HotelDto>  createNewHotel(@RequestBody HotelDto hotelDto){
+    public ResponseEntity<HotelDto>  createNewHotel(@RequestBody @Valid HotelDto hotelDto){
         HotelDto hotel=hotelService.cretaeNewHotel(hotelDto);
 
         return new ResponseEntity<>(hotel,HttpStatus.CREATED);
@@ -39,7 +43,7 @@ public class HotelController {
     }
 
     @PutMapping("/{hotelId}")
-    public ResponseEntity<HotelDto> updateHotelById(@PathVariable Long hotelId,@RequestBody HotelDto hotelDto){
+    public ResponseEntity<HotelDto> updateHotelById(@PathVariable Long hotelId,@RequestBody @Valid HotelDto hotelDto){
         HotelDto  hotelDto2=hotelService.updateHotelById(hotelId, hotelDto);
         return new ResponseEntity<>(hotelDto2,HttpStatus.OK);
 
@@ -50,5 +54,9 @@ public class HotelController {
         hotelService.deleteHotelById(hotelId);
     }
 
+    @GetMapping
+    public ResponseEntity<List<HotelDto>> getAllHotel() {
+       return  ResponseEntity.ok(hotelService.getAllHotel());
+    }
 
 }
