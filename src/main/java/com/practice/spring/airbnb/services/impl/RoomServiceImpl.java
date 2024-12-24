@@ -12,6 +12,7 @@ import com.practice.spring.airbnb.entities.Room;
 import com.practice.spring.airbnb.exception.ResourceNotFoundException;
 import com.practice.spring.airbnb.repositories.HotelRepository;
 import com.practice.spring.airbnb.repositories.RoomRepository;
+import com.practice.spring.airbnb.services.InventoryService;
 import com.practice.spring.airbnb.services.RoomService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class RoomServiceImpl implements RoomService{
      private final ModelMapper modelMapper;
      private final RoomRepository roomRepository;
      private final HotelRepository hotelRepository;
+     private final InventoryService inventoryService;
 
     @Override
     public RoomDto createNewRoom(Long hotelId,RoomDto roomDto) {
@@ -34,6 +36,10 @@ public class RoomServiceImpl implements RoomService{
 
         room.setHotel(hotel);
         room=roomRepository.save(room);
+
+        if(hotel.isActive()){
+            inventoryService.initializeRoomForAYear(room);
+        }
         return modelMapper.map(room, RoomDto.class);
     }
 
@@ -65,7 +71,9 @@ public class RoomServiceImpl implements RoomService{
         .orElseThrow(
             ()-> new ResourceNotFoundException("Room not found with id "+roomId));
         
+        inventoryService.deleteFutureInventories(room);
         roomRepository.delete(room);
+
     }
 
 }

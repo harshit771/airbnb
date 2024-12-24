@@ -17,6 +17,9 @@ import lombok.*;
         uniqueConstraints = @UniqueConstraint
         (name="unique_hotel_name_date",
         columnNames = {"hotel_id","room_id","date"}))
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Inventory {
 
     @Id
