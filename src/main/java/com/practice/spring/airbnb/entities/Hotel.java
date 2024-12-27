@@ -2,7 +2,6 @@ package com.practice.spring.airbnb.entities;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
