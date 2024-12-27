@@ -8,6 +8,7 @@ import com.practice.spring.airbnb.dto.HotelDto;
 import com.practice.spring.airbnb.entities.Hotel;
 import com.practice.spring.airbnb.entities.Room;
 import com.practice.spring.airbnb.repositories.HotelRepository;
+import com.practice.spring.airbnb.repositories.RoomRepository;
 import com.practice.spring.airbnb.services.HotelService;
 import com.practice.spring.airbnb.services.InventoryService;
 
@@ -22,6 +23,7 @@ public class HotelServiceImpl implements HotelService{
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
     private final InventoryService inventoryService;
+    private final RoomRepository roomRepository;
 
 
     @Override
@@ -59,7 +61,9 @@ public class HotelServiceImpl implements HotelService{
                       .orElseThrow(() -> new ResourceAccessException("Hotel not found with id "+id));
 
         for(Room room : hotel.getRooms()){
-            inventoryService.deleteFutureInventories(room);
+            inventoryService.deleteAllInventories(room);
+            roomRepository.deleteById(room.getId());
+            
         }
         hotelRepository.delete(hotel);
         
