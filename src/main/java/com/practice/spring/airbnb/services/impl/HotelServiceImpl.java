@@ -1,10 +1,14 @@
 package com.practice.spring.airbnb.services.impl;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
 import com.practice.spring.airbnb.dto.HotelDto;
+import com.practice.spring.airbnb.dto.HotelInfoDto;
+import com.practice.spring.airbnb.dto.RoomDto;
 import com.practice.spring.airbnb.entities.Hotel;
 import com.practice.spring.airbnb.entities.Room;
 import com.practice.spring.airbnb.repositories.HotelRepository;
@@ -79,6 +83,19 @@ public class HotelServiceImpl implements HotelService{
         for(Room room : hotel.getRooms()){
             inventoryService.initializeRoomForAYear(room);
         }
+    }
+
+    @Override
+    public HotelInfoDto getHotelInfoById(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                      .orElseThrow(() -> new ResourceAccessException("Hotel not found with id "+hotelId));
+        
+        List<RoomDto> rooms=hotel.getRooms()
+                            .stream()
+                            .map((elements) -> modelMapper.map(elements,RoomDto.class))
+                            .toList();
+        return new HotelInfoDto(modelMapper.map(hotel,HotelDto.class), rooms);       
+
     }
     
 
