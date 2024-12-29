@@ -8,9 +8,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,7 +33,10 @@ public class Payment {
     private PaymentStatus paymentStatus;
 
     @Column(nullable = false,precision = 10,scale = 2)
-    private BigDecimal price;
+    private BigDecimal amount;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
 
 }

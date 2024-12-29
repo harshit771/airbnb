@@ -1,5 +1,6 @@
 package com.practice.spring.airbnb.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,6 +16,9 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name="booking")
 public class Booking {
 
@@ -49,10 +53,6 @@ public class Booking {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
@@ -66,4 +66,6 @@ public class Booking {
 
     private Set<Guest> guests;
 
+     @Column(nullable = false,precision = 10,scale = 2)
+    private BigDecimal amount;
 }
