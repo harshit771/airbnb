@@ -3,13 +3,11 @@ package com.practice.spring.airbnb.strategy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.springframework.stereotype.Service;
-
 import com.practice.spring.airbnb.entities.Inventory;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+
 @RequiredArgsConstructor
 public class UrgencyPricingStrategy implements PricingStrategy{
 
