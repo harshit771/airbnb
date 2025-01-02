@@ -6,7 +6,7 @@ This project is a Java-based application modeled after Airbnb, focusing on core 
 - **Property Listings**: Users can browse and search for available properties.
 - **User Authentication**: Secure registration and login functionalities.
 - **Booking Management**: Users can book properties and manage their reservations.
-- **Dynamic Pricing**: Based on some factors , hotel prices can increases.
+- **Dynamic Pricing**: Using dynamic pricing stategy for hotels price.
 
 ## Technologies Used
 
@@ -30,3 +30,12 @@ This project is a Java-based application modeled after Airbnb, focusing on core 
 
    ```bash
    git clone https://github.com/harshit771/airbnb.git
+
+2. **Java version downlod**:
+
+      go to below website and download & install java on your machine
+       https://www.oracle.com/in/java/technologies/downloads/
+
+3. **PostgreSQL**:   
+
+      https://www.postgresql.org/download/
