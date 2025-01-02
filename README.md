@@ -6,6 +6,7 @@ This project is a Java-based application modeled after Airbnb, focusing on core 
 - **Property Listings**: Users can browse and search for available properties.
 - **User Authentication**: Secure registration and login functionalities.
 - **Booking Management**: Users can book properties and manage their reservations.
+- **Dynamic Pricing**: Based on some factors , hotel prices can increases.
 
 ## Technologies Used
 
