@@ -1,6 +1,5 @@
 package com.practice.spring.airbnb.services.impl;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +18,6 @@ public class UserServiceImpl implements UserService, UserDetailsService{
     
     
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
 
     @Override
     public User getUserId(Long id) {
