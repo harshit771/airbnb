@@ -21,6 +21,7 @@ import com.practice.spring.airbnb.entities.Room;
 import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.entities.enums.BookingStatus;
 import com.practice.spring.airbnb.exception.ResourceNotFoundException;
+import com.practice.spring.airbnb.exception.UnAuthorizeException;
 import com.practice.spring.airbnb.repositories.BookingRepository;
 import com.practice.spring.airbnb.repositories.GuestRepositoy;
 import com.practice.spring.airbnb.repositories.HotelRepository;
@@ -95,7 +96,11 @@ public class BookingServiceImpl implements BookingService{
         Booking booking=bookingRepository.findById(bookingId)
                                 .orElseThrow(() -> 
                                 new ResourceNotFoundException("Booking not found with id "+bookingId));
-                          
+        
+        User user=getCurrentUser();
+        if(!user.equals(booking.getUser())){
+            throw new UnAuthorizeException("Booking does not belong to this user with id "+user.getId());
+        }                       
         if(isBookingExpired(booking)){
             throw new IllegalStateException("Booking has already expired");
         }

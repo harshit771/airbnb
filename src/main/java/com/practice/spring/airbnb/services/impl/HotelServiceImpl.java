@@ -47,7 +47,10 @@ public class HotelServiceImpl implements HotelService {
     public HotelDto getHotelById(Long id) {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceAccessException("Hotel not found with id " + id));
-
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizeException("This user does not own this hotel with id "+id);
+        }
         return modelMapper.map(hotel, HotelDto.class);
     }
 
@@ -56,8 +59,8 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceAccessException("Hotel not found with id " + id));
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.equals(hotel.getOwner())) {
-            throw new UnAuthorizeException("User has no access to update hotel with id " + id);
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizeException("This user does not own this hotel with id "+id);
         }
         modelMapper.map(hotelDto, hotel);
         hotel.setId(id);
@@ -73,8 +76,8 @@ public class HotelServiceImpl implements HotelService {
                 .orElseThrow(() -> new ResourceAccessException("Hotel not found with id " + id));
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.equals(hotel.getOwner())) {
-            throw new UnAuthorizeException("User has no access to delete hotel with id " + id);
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizeException("This user does not own this hotel with id "+id);
         }
         for (Room room : hotel.getRooms()) {
             inventoryService.deleteAllInventories(room);
@@ -91,8 +94,8 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceAccessException("Hotel not found with id " + id));
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!user.equals(hotel.getOwner())) {
-            throw new UnAuthorizeException("User has no access to active hotel with id " + id);
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizeException("This user does not own this hotel with id "+id);
         }
         hotel.setActive(true);
 

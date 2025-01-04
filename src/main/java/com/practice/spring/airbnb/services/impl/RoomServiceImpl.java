@@ -39,7 +39,7 @@ public class RoomServiceImpl implements RoomService{
 
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(!user.equals(hotel.getOwner())){
-            throw new UnAuthorizeException("User has no access to add room in hotel with id "+hotelId);
+            throw new UnAuthorizeException("This user does not own this hotel with id "+hotelId);
         }
         room.setHotel(hotel);
         room=roomRepository.save(room);
@@ -55,7 +55,10 @@ public class RoomServiceImpl implements RoomService{
         Hotel hotel=hotelRepository.findById(hotelId).orElseThrow(
             ()-> new ResourceNotFoundException("Hotel not found with id "+hotelId));
 
-
+         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+                throw new UnAuthorizeException("This user does not own this hotel with id "+hotelId);
+        }
         return hotel.getRooms()
         .stream().map((elements) -> 
         modelMapper.map(elements, RoomDto.class)).
@@ -79,7 +82,7 @@ public class RoomServiceImpl implements RoomService{
             ()-> new ResourceNotFoundException("Room not found with id "+roomId));
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(!user.equals(room.getHotel().getOwner())){
-            throw new UnAuthorizeException("User has no access to delete room in hotel with id "+room.getHotel().getId());
+            throw new UnAuthorizeException("This user does not own this room with id "+roomId);
         }
         inventoryService.deleteAllInventories(room);
         roomRepository.delete(room);

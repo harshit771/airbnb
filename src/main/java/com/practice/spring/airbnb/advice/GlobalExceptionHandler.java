@@ -68,6 +68,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
+        System.err.println("cs jsbdajbj");
         ApiError apiError = new ApiError(ex.getLocalizedMessage(), HttpStatus.FORBIDDEN);
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
     }
