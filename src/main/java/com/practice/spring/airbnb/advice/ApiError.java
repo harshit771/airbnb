@@ -10,6 +10,9 @@ import lombok.*;
 @NoArgsConstructor
 public class ApiError {
 
+    public ApiError(String localizedMessage, HttpStatus unauthorized) {
+        //TODO Auto-generated constructor stub
+    }
     private HttpStatus status;
     private String message;
     private List<String> subErrors;

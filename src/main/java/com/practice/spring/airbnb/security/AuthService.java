@@ -10,11 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.practice.spring.airbnb.dto.LoginDto;
+import com.practice.spring.airbnb.dto.LoginResponseDto;
 import com.practice.spring.airbnb.dto.SignUpRequestDto;
 import com.practice.spring.airbnb.dto.UserDto;
 import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.entities.enums.Role;
 import com.practice.spring.airbnb.repositories.UserRepository;
+import com.practice.spring.airbnb.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final SessionService sessionService;
+    private final UserService userService;
 
     public UserDto signUp(SignUpRequestDto signUpRequestDto){
 
@@ -58,5 +62,14 @@ public class AuthService {
 
         return arr;
 
+    }
+
+    public LoginResponseDto refreshToken(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        sessionService.validateSession(refreshToken);
+        User user = userService.getUserById(userId);
+
+        String accessToken = jwtService.generateAccessToken(user);
+        return new LoginResponseDto(accessToken);
     }
 }

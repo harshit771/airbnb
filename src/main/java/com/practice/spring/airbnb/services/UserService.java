@@ -5,4 +5,6 @@ import com.practice.spring.airbnb.entities.User;
 public interface UserService {
 
     User getUserId(Long id);
+
+    User getUserById(Long userId);
 }
