@@ -99,7 +99,7 @@ public class BookingServiceImpl implements BookingService{
         
         User user=getCurrentUser();
         if(!user.equals(booking.getUser())){
-            throw new UnAuthorizeException("Booking does not belong to this user with id "+user.getId());
+            throw new UnAuthorizeException("Booking does not belong to this user with id"+user.getId());
         }                       
         if(isBookingExpired(booking)){
             throw new IllegalStateException("Booking has already expired");

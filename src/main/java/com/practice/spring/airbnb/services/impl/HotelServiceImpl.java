@@ -94,8 +94,8 @@ public class HotelServiceImpl implements HotelService {
         Hotel hotel = hotelRepository.findById(id)
                 .orElseThrow(() -> new ResourceAccessException("Hotel not found with id " + id));
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(!user.equals(hotel.getOwner())){
-            throw new UnAuthorizeException("This user does not own this hotel with id "+id);
+        if (!user.equals(hotel.getOwner())) {
+            throw new UnAuthorizeException("User has no access to active hotel with id " + id);
         }
         hotel.setActive(true);
 
