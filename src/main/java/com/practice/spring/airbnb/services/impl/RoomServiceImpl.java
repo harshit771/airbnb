@@ -4,12 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.practice.spring.airbnb.dto.RoomDto;
 import com.practice.spring.airbnb.entities.Hotel;
 import com.practice.spring.airbnb.entities.Room;
+import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.exception.ResourceNotFoundException;
+import com.practice.spring.airbnb.exception.UnAuthorizeException;
 import com.practice.spring.airbnb.repositories.HotelRepository;
 import com.practice.spring.airbnb.repositories.RoomRepository;
 import com.practice.spring.airbnb.services.InventoryService;
@@ -34,6 +37,10 @@ public class RoomServiceImpl implements RoomService{
         Hotel hotel=hotelRepository.findById(hotelId).orElseThrow(
             ()-> new ResourceNotFoundException("Hotel not found with id "+hotelId));
 
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(hotel.getOwner())){
+            throw new UnAuthorizeException("User has no access to add room in hotel with id "+hotelId);
+        }
         room.setHotel(hotel);
         room=roomRepository.save(room);
 
@@ -61,7 +68,7 @@ public class RoomServiceImpl implements RoomService{
         .orElseThrow(
             ()-> new ResourceNotFoundException("Room not found with id "+roomId));
         
-            return modelMapper.map(room, RoomDto.class);
+        return modelMapper.map(room, RoomDto.class);
             
     }
 
@@ -70,7 +77,10 @@ public class RoomServiceImpl implements RoomService{
         Room room=roomRepository.findById(roomId)
         .orElseThrow(
             ()-> new ResourceNotFoundException("Room not found with id "+roomId));
-        
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(!user.equals(room.getHotel().getOwner())){
+            throw new UnAuthorizeException("User has no access to delete room in hotel with id "+room.getHotel().getId());
+        }
         inventoryService.deleteAllInventories(room);
         roomRepository.delete(room);
 
