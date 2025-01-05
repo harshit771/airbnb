@@ -38,6 +38,8 @@ public class RoomServiceImpl implements RoomService{
             ()-> new ResourceNotFoundException("Hotel not found with id "+hotelId));
 
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("user details "+user.getEmail()+" "+user);
+        log.info("hotel owner "+hotel.getOwner());
         if(!user.equals(hotel.getOwner())){
             throw new UnAuthorizeException("This user does not own this hotel with id "+hotelId);
         }
