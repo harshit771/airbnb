@@ -44,7 +44,7 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                                 return;
                         }
 
-                        String token = requestTokenHeader.split("Bearer")[1];
+                        String token = requestTokenHeader.split("Bearer ")[1];
                         Long userId = jwtService.getUserIdFromToken(token);
 
                         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -58,9 +58,9 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request, response);
 
                 } catch (JwtException exception) {
-                        handlerExceptionResolver.resolveException(request, response, filterChain, exception);
+                        handlerExceptionResolver.resolveException(request, response, null, exception);
                 }catch(Exception e){
-                        handlerExceptionResolver.resolveException(request, response, filterChain, e);
+                        handlerExceptionResolver.resolveException(request, response, null, e);
                 }
         }
 }

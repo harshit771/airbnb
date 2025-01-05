@@ -36,8 +36,10 @@ public class HotelServiceImpl implements HotelService {
     @Override
     public HotelDto cretaeNewHotel(HotelDto hotelDto) {
         Hotel hotel = modelMapper.map(hotelDto, Hotel.class);
+        System.err.println("Before gettimg user details");
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         hotel.setActive(false);
+        System.err.println("After getting user details "+user);
         hotel.setOwner(user);
         hotel = hotelRepository.save(hotel);
         return modelMapper.map(hotel, HotelDto.class);

@@ -67,7 +67,7 @@ public class WebSecurityConfig {
             @Override
             public void handle(HttpServletRequest request, HttpServletResponse response,
                     AccessDeniedException accessDeniedException) throws IOException, ServletException {
-                    handlerExceptionResolver.resolveException(request, response, response, accessDeniedException) ;  
+                    handlerExceptionResolver.resolveException(request, response, null, accessDeniedException) ;  
             }
             
         };
