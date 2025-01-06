@@ -14,6 +14,7 @@ import com.practice.spring.airbnb.dto.BookingRequest;
 import com.practice.spring.airbnb.dto.GuestDto;
 import com.practice.spring.airbnb.services.BookingService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +30,7 @@ public class HotelBookingController {
     }
 
     @PostMapping("/{bookingId}/addGuests")
-    public ResponseEntity<BookingDto> addGuest(@PathVariable Long bookingId, @RequestBody List<GuestDto> guestList){
+    public ResponseEntity<BookingDto> addGuest(@PathVariable Long bookingId, @RequestBody @Valid List<GuestDto> guestList){
         return ResponseEntity.ok(bookingService.addGuest(bookingId,guestList));
     }
 }

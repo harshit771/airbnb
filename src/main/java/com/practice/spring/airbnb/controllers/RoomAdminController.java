@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.practice.spring.airbnb.dto.RoomDto;
 import com.practice.spring.airbnb.services.RoomService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,7 +26,7 @@ public class RoomAdminController {
     private final RoomService roomService;
 
     @PostMapping
-    public ResponseEntity<RoomDto> createNewRoom(@PathVariable Long hotelId , @RequestBody RoomDto roomDto){
+    public ResponseEntity<RoomDto> createNewRoom(@PathVariable Long hotelId , @RequestBody @Valid RoomDto roomDto){
         RoomDto  room=roomService.createNewRoom(hotelId, roomDto);
         return new ResponseEntity<>(room,HttpStatus.CREATED);
 

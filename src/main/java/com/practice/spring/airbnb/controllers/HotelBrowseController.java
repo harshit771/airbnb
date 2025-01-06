@@ -9,6 +9,7 @@ import com.practice.spring.airbnb.dto.HotelSearchRequest;
 import com.practice.spring.airbnb.services.HotelService;
 import com.practice.spring.airbnb.services.InventoryService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class HotelBrowseController {
     private final HotelService hotelService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<HotelPriceDto>> searchHotel(@RequestBody HotelSearchRequest hotelSearchRequest){
+    public ResponseEntity<Page<HotelPriceDto>> searchHotel(@RequestBody @Valid HotelSearchRequest hotelSearchRequest){
         Page<HotelPriceDto> page=inventoryService.searchHotels(hotelSearchRequest);
         return ResponseEntity.ok(page);
     }
