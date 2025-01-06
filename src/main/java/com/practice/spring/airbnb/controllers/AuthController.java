@@ -19,6 +19,7 @@ import com.practice.spring.airbnb.security.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,12 +30,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signUp")
-    public ResponseEntity<UserDto> signUp(@RequestBody SignUpRequestDto signUpRequestDto){
+    public ResponseEntity<UserDto> signUp(@RequestBody @Valid SignUpRequestDto signUpRequestDto){
         return new ResponseEntity<>(authService.signUp(signUpRequestDto),HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginDto loginDto,HttpServletRequest httpServletRequest,
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginDto loginDto,HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse){
         String[] tokens = authService.login(loginDto);
 
