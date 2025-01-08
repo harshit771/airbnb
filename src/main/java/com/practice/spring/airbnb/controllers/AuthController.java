@@ -14,6 +14,7 @@ import com.practice.spring.airbnb.dto.LoginDto;
 import com.practice.spring.airbnb.dto.LoginResponseDto;
 import com.practice.spring.airbnb.dto.SignUpRequestDto;
 import com.practice.spring.airbnb.dto.UserDto;
+import com.practice.spring.airbnb.exception.UnAuthorizeException;
 import com.practice.spring.airbnb.security.AuthService;
 
 import jakarta.servlet.http.Cookie;
@@ -37,15 +38,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginDto loginDto,HttpServletRequest httpServletRequest,
             HttpServletResponse httpServletResponse){
-        String[] tokens = authService.login(loginDto);
 
+        try{       
+        String[] tokens = authService.login(loginDto);
         Cookie cookie=new Cookie("refreshToken", tokens[1]);
         cookie.setHttpOnly(true);
-
         httpServletResponse.addCookie(cookie);
-
         return ResponseEntity.ok(new LoginResponseDto(tokens[0]));
-
+         }catch(AuthenticationServiceException e){
+                throw  new AuthenticationServiceException("Invalid credentials");
+         }
     }
 
     @PostMapping("/refresh")
