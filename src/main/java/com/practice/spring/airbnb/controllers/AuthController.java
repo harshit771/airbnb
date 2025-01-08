@@ -14,7 +14,6 @@ import com.practice.spring.airbnb.dto.LoginDto;
 import com.practice.spring.airbnb.dto.LoginResponseDto;
 import com.practice.spring.airbnb.dto.SignUpRequestDto;
 import com.practice.spring.airbnb.dto.UserDto;
-import com.practice.spring.airbnb.exception.UnAuthorizeException;
 import com.practice.spring.airbnb.security.AuthService;
 
 import jakarta.servlet.http.Cookie;
