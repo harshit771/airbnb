@@ -8,6 +8,7 @@ import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.entities.enums.Gender;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -19,11 +20,11 @@ public class GuestDto {
     @NotBlank(message = "Guest name cannot be blank" )
     private String name;
 
-    @NotBlank(message = "Guest gender cannot be blank" )
-    @EnumValue
+    @NotNull(message = "Guest gender cannot be blank" )
+    //@EnumValue
     private Gender gender;
 
-    @NotBlank(message = "Age cannot be blank")
+    @NotNull(message = "Age cannot be blank")
     private Integer age;
 
 
