@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         for (Inventory inventory : inventories) {
-            inventory.setReversedCount(inventory.getReversedCount() + bookingRequest.getRoomsCount());
+            inventory.setReservedCount(inventory.getReservedCount() + bookingRequest.getRoomsCount());
 
         }
         inventoryRepository.saveAll(inventories);
@@ -183,6 +183,23 @@ public class BookingServiceImpl implements BookingService {
         } else {
             log.warn("unhandled event type " + event.getType());
         }
+    }
+
+    @Override
+    public void cancelPayment(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(
+                () -> new ResourceNotFoundException("Booking not found with id " + bookingId));
+        User user = getCurrentUser();
+        if (!user.equals(booking.getUser())) {
+            throw new UnAuthorizeException("Booking does not belong to this user with id" + user.getId());
+        }
+        if (booking.getBookingStatus() != BookingStatus.CONFIRMED) {
+            throw new IllegalStateException("Only Confirmed booking can be cancelled");
+        }
+
+        booking.setBookingStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+
     }
 
 }

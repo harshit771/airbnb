@@ -18,40 +18,39 @@ import com.practice.spring.airbnb.entities.Room;
 import jakarta.persistence.LockModeType;
 
 @Repository
-public interface InventoryRepository extends JpaRepository<Inventory,Long>{
+public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     void deleteByRoom(Room room);
 
     @Query("""
             Select distinct i.hotel from Inventory i where i.city = :city
             and i.date between :startDate and :endDate
-            and i.closed=false 
-            and (i.totalCount - i.bookedCount - i.reversedCount) >= :roomsCount
+            and i.closed=false
+            and (i.totalCount - i.bookedCount - i.reservedCount) >= :roomsCount
             group by i.hotel,i.room having count(i.date) = :dateCount
             """)
     Page<Hotel> findHotelsWithAvailableInventory(
-        @Param("city") String city,
-        @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate,
-        @Param("roomsCount")Integer roomsCount,
-        @Param("dateCount")long dateCount,
-        Pageable pageable
+            @Param("city") String city,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("roomsCount") Integer roomsCount,
+            @Param("dateCount") long dateCount,
+            Pageable pageable
 
     );
 
     @Query("""
-            Select i from Inventory i where i.room.id = :roomId 
+            Select i from Inventory i where i.room.id = :roomId
             and i.date between :startDate and :endDate
-            and i.closed=false 
-            and (i.totalCount - i.bookedCount - i.reversedCount ) >= :roomsCount
+            and i.closed=false
+            and (i.totalCount - i.bookedCount - i.reservedCount ) >= :roomsCount
             """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Inventory> findAndLockInventory(
-        @Param("roomId") Long roomId,
-        @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate,
-        @Param("roomsCount")Integer roomsCount
-    );
+            @Param("roomId") Long roomId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("roomsCount") Integer roomsCount);
 
     @Query("""
                 SELECT i
@@ -63,25 +62,25 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long>{
             """)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Inventory> findAndLockReservedInventory(@Param("roomId") Long roomId,
-                                                 @Param("startDate") LocalDate startDate,
-                                                 @Param("endDate") LocalDate endDate,
-                                                 @Param("numberOfRooms") int numberOfRooms);
-                                                 
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("numberOfRooms") int numberOfRooms);
+
     @Modifying
     @Query("""
                 UPDATE Inventory i
-                SET i.reversedCount = i.reversedCount - :numberOfRooms,
+                SET i.reservedCount = i.reservedCount - :numberOfRooms,
                     i.bookedCount = i.bookedCount + :numberOfRooms
                 WHERE i.room.id = :roomId
                   AND i.date BETWEEN :startDate AND :endDate
                   AND (i.totalCount - i.bookedCount) >= :numberOfRooms
-                  AND i.reversedCount >= :numberOfRooms
+                  AND i.reservedCount >= :numberOfRooms
                   AND i.closed = false
             """)
     void confirmBooking(@Param("roomId") Long roomId,
-                        @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate,
-                        @Param("numberOfRooms") int numberOfRooms);
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("numberOfRooms") int numberOfRooms);
 
     List<Inventory> findByHotelAndDateBetween(Hotel hotel, LocalDate starDate, LocalDate endDate);
 
