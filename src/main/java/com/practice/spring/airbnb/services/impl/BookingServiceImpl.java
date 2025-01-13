@@ -30,8 +30,12 @@ import com.practice.spring.airbnb.repositories.InventoryRepository;
 import com.practice.spring.airbnb.repositories.RoomRepository;
 import com.practice.spring.airbnb.services.BookingService;
 import com.practice.spring.airbnb.services.CheckoutService;
+import com.practice.spring.airbnb.strategy.PricingService;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
+import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
+import com.stripe.param.RefundCreateParams;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +53,7 @@ public class BookingServiceImpl implements BookingService {
     private final ModelMapper modelMapper;
     private final GuestRepositoy guestRepositoy;
     private final CheckoutService checkoutService;
+    private final PricingService priceService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -73,12 +78,11 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Rooms are not available anymore");
         }
 
-        for (Inventory inventory : inventories) {
-            inventory.setReservedCount(inventory.getReservedCount() + bookingRequest.getRoomsCount());
+        inventoryRepository.initBooking(bookingRequest.getRoomId(), bookingRequest.getCheckInDate(),
+                bookingRequest.getCheckOutDate(), bookingRequest.getRoomsCount());
 
-        }
-        inventoryRepository.saveAll(inventories);
-
+        BigDecimal priceForOneRoom = priceService.calculateTotalPrice(inventories);
+        BigDecimal totalPrice = priceForOneRoom.multiply(BigDecimal.valueOf(bookingRequest.getRoomsCount()));
         Booking booking = Booking.builder()
                 .bookingStatus(BookingStatus.RESERVED)
                 .hotel(hotel)
@@ -87,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
                 .checkOutDate(bookingRequest.getCheckOutDate())
                 .user(getCurrentUser())
                 .roomsCount(bookingRequest.getRoomsCount())
-                .amount(BigDecimal.TEN)
+                .amount(totalPrice)
                 .build();
 
         booking = bookingRepository.save(booking);
@@ -200,6 +204,22 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus(BookingStatus.CANCELLED);
         bookingRepository.save(booking);
 
+        inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
+                booking.getCheckOutDate(), booking.getRoomsCount());
+
+        inventoryRepository.cancelBooking(booking.getRoom().getId(), booking.getCheckInDate(),
+                booking.getCheckOutDate(), booking.getRoomsCount());
+
+        try {
+            Session session = Session.retrieve(booking.getPaymentSessionId());
+            RefundCreateParams refundCreateParams = RefundCreateParams.builder()
+                    .setPaymentIntent(session.getPaymentIntent())
+                    .build();
+            Refund.create(refundCreateParams);
+        } catch (StripeException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
 }
