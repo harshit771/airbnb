@@ -26,24 +26,31 @@ public class HotelBookingController {
     private final BookingService bookingService;
 
     @PostMapping("/init")
-    public ResponseEntity<BookingDto> initialseBooking(@RequestBody BookingRequest bookingRequest){
+    public ResponseEntity<BookingDto> initialseBooking(@RequestBody BookingRequest bookingRequest) {
         return ResponseEntity.ok(bookingService.initialseBooking(bookingRequest));
     }
 
     @PostMapping("/{bookingId}/addGuests")
-    public ResponseEntity<BookingDto> addGuest(@PathVariable Long bookingId, @RequestBody @Valid List<GuestDto> guestList){
-        return ResponseEntity.ok(bookingService.addGuest(bookingId,guestList));
+    public ResponseEntity<BookingDto> addGuest(@PathVariable Long bookingId,
+            @RequestBody @Valid List<GuestDto> guestList) {
+        return ResponseEntity.ok(bookingService.addGuest(bookingId, guestList));
     }
 
     @PostMapping("/{bookingId}/payments")
-    public ResponseEntity<Map<String,String>> initiatePayment(@PathVariable Long bookingId){
-        String sessionUrl=bookingService.initiatePayment(bookingId);
-        return ResponseEntity.ok(Map.of("sessionUrl",sessionUrl));
+    public ResponseEntity<Map<String, String>> initiatePayment(@PathVariable Long bookingId) {
+        String sessionUrl = bookingService.initiatePayment(bookingId);
+        return ResponseEntity.ok(Map.of("sessionUrl", sessionUrl));
     }
 
     @PostMapping("/{bookingId}/cancel")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId){
+    public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId) {
         bookingService.cancelPayment(bookingId);
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{bookingId}/status")
+    public ResponseEntity<Map<String, String>> getBookingStatus(@PathVariable Long bookingId) {
+        String bookingStatus = bookingService.getBookingStatus(bookingId);
+        return ResponseEntity.ok(Map.of("status", bookingStatus));
     }
 }
