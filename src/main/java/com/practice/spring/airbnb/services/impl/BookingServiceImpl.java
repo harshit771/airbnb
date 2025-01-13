@@ -150,7 +150,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Booking has already expired");
         }
 
-        String sessionUrl = checkoutService.getCheckoutSession(booking, frontendUrl + "/ payments/success",
+        String sessionUrl = checkoutService.getCheckoutSession(booking, frontendUrl + "/payments/success",
                 frontendUrl + "/payments/failure");
 
         booking.setBookingStatus(BookingStatus.PAYMENTS_PENDING);
@@ -161,20 +161,28 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public void capturePayment(Event event) {
-       if("checkout.session.completed".equals(event.getType())){
-        Session session = (Session)event.getDataObjectDeserializer().getObject().orElse(null);
-        if(session == null) return;
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+            if (session == null)
+                return;
 
-        String sessionId=session.getId();
-        Booking booking=bookingRepository.findByPaymentSessionId(sessionId).orElseThrow(
-            () -> new ResourceNotFoundException("Booking not found for session "+sessionId));
+            String sessionId = session.getId();
+            Booking booking = bookingRepository.findByPaymentSessionId(sessionId).orElseThrow(
+                    () -> new ResourceNotFoundException("Booking not found for session " + sessionId));
 
-         booking.setBookingStatus(BookingStatus.CONFIRMED);
-         bookingRepository.save(booking);
-            
-       }else{
-        System.out.println("unhandled event type "+event.getType());
-       }
+            booking.setBookingStatus(BookingStatus.CONFIRMED);
+
+            bookingRepository.save(booking);
+
+            inventoryRepository.findAndLockReservedInventory(booking.getRoom().getId(), booking.getCheckInDate(),
+                    booking.getCheckOutDate(), booking.getRoomsCount());
+
+            inventoryRepository.confirmBooking(booking.getRoom().getId(), booking.getCheckInDate(),
+                    booking.getCheckOutDate(), booking.getRoomsCount());
+
+        } else {
+            log.warn("unhandled event type " + event.getType());
+        }
     }
 
 }
