@@ -30,6 +30,8 @@ import com.practice.spring.airbnb.repositories.InventoryRepository;
 import com.practice.spring.airbnb.repositories.RoomRepository;
 import com.practice.spring.airbnb.services.BookingService;
 import com.practice.spring.airbnb.services.CheckoutService;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +97,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto addGuest(Long bookingId, List<GuestDto> guestList) {
         log.info("Adding guest ");
 
@@ -135,6 +138,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public String initiatePayment(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new ResourceNotFoundException("Booking not found with id " + bookingId));
@@ -146,12 +150,31 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Booking has already expired");
         }
 
-        String sessionUrl = checkoutService.getCheckoutSession(booking, frontendUrl + "/payments/success",
+        String sessionUrl = checkoutService.getCheckoutSession(booking, frontendUrl + "/ payments/success",
                 frontendUrl + "/payments/failure");
 
         booking.setBookingStatus(BookingStatus.PAYMENTS_PENDING);
         bookingRepository.save(booking);
         return sessionUrl;
+    }
+
+    @Override
+    @Transactional
+    public void capturePayment(Event event) {
+       if("checkout.session.completed".equals(event.getType())){
+        Session session = (Session)event.getDataObjectDeserializer().getObject().orElse(null);
+        if(session == null) return;
+
+        String sessionId=session.getId();
+        Booking booking=bookingRepository.findByPaymentSessionId(sessionId).orElseThrow(
+            () -> new ResourceNotFoundException("Booking not found for session "+sessionId));
+
+         booking.setBookingStatus(BookingStatus.CONFIRMED);
+         bookingRepository.save(booking);
+            
+       }else{
+        System.out.println("unhandled event type "+event.getType());
+       }
     }
 
 }
