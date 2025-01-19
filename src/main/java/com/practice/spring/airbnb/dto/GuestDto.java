@@ -2,7 +2,6 @@ package com.practice.spring.airbnb.dto;
 
 import java.util.Set;
 
-import com.practice.spring.airbnb.customanotations.EnumValue;
 import com.practice.spring.airbnb.entities.Booking;
 import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.entities.enums.Gender;

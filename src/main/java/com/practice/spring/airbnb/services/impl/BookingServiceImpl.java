@@ -2,13 +2,11 @@ package com.practice.spring.airbnb.services.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
