@@ -1,9 +1,15 @@
 package com.practice.spring.airbnb.services.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.practice.spring.airbnb.dto.BookingDto;
 import com.practice.spring.airbnb.dto.BookingRequest;
 import com.practice.spring.airbnb.dto.GuestDto;
+import com.practice.spring.airbnb.dto.HotelReportDto;
 import com.practice.spring.airbnb.entities.Booking;
 import com.practice.spring.airbnb.entities.Guest;
 import com.practice.spring.airbnb.entities.Hotel;
@@ -136,11 +143,6 @@ public class BookingServiceImpl implements BookingService {
         return booking.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now());
     }
 
-    public User getCurrentUser() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user;
-    }
-
     @Override
     @Transactional
     public String initiatePayment(Long bookingId) {
@@ -230,8 +232,64 @@ public class BookingServiceImpl implements BookingService {
         if (!user.equals(booking.getUser())) {
             throw new UnAuthorizeException("Booking does not belong to this user with id" + user.getId());
         }
-        
+
         return booking.getBookingStatus().name();
+    }
+
+    public User getCurrentUser() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user;
+    }
+
+    @Override
+    public List<BookingDto> getAllBookingsByHotels(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id " + hotelId));
+        User user = getCurrentUser();
+
+        if (user.equals(hotel.getOwner())) {
+            throw new UnAuthorizeException("You are not owner of the hotel with id" + hotelId);
+        }
+
+        log.info("Getting booking with hotel id " + hotelId);
+
+        List<Booking> bookings = bookingRepository.findByHotel(hotel);
+
+        return bookings.stream()
+                .map((booking) -> modelMapper.map(booking, BookingDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public HotelReportDto getHotelReport(Long hotelId, LocalDate starDate, LocalDate endDate) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id " + hotelId));
+        User user = getCurrentUser();
+
+        if (user.equals(hotel.getOwner())) {
+            throw new UnAuthorizeException("You are not owner of the hotel with id" + hotelId);
+        }
+
+        log.info("Generating report for hotel with id " + hotelId);
+
+        LocalDateTime startDateTime = starDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        List<Booking> bookings = bookingRepository.findByHoelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
+
+        Long totalConfirmBooking = bookings.stream().filter(
+                booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+                .count();
+
+        BigDecimal totalRevenueofConfirmedBooking = bookings.stream().filter(
+                booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+                .map(Booking::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal avrgRevenue = totalConfirmBooking == 0 ? BigDecimal.ZERO
+                : totalRevenueofConfirmedBooking.divide(BigDecimal.valueOf(totalConfirmBooking), RoundingMode.HALF_UP);
+
+        return new HotelReportDto(totalConfirmBooking, totalRevenueofConfirmedBooking, avrgRevenue);
     }
 
 }

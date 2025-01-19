@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import com.practice.spring.airbnb.exception.ResourceNotFoundException;
+import com.practice.spring.airbnb.exception.UnAuthorizeException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
-   @ExceptionHandler(Exception.class)
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<?>> handleInternalServerError(Exception exception) {
         ApiError apiError = ApiError.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -81,4 +82,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponseEntity(apiError);
     }
 
+    @ExceptionHandler(UnAuthorizeException.class)
+    public ResponseEntity<ApiResponse<?>> handleUnAthoException(ResourceNotFoundException exception) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .message(exception.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
 }

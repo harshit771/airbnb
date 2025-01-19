@@ -1,5 +1,7 @@
 package com.practice.spring.airbnb.services;
 
+import java.util.List;
+
 import com.practice.spring.airbnb.dto.HotelDto;
 import com.practice.spring.airbnb.dto.HotelInfoDto;
 
@@ -16,6 +18,8 @@ public interface HotelService {
     void activateHotel(Long id);
 
     HotelInfoDto getHotelInfoById(Long hotelId);
+
+    List<HotelDto> getAllHotels();
 
 
 
