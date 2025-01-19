@@ -273,7 +273,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime startDateTime = starDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
 
-        List<Booking> bookings = bookingRepository.findByHoelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
+        List<Booking> bookings = bookingRepository.findByHotelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
 
         Long totalConfirmBooking = bookings.stream().filter(
                 booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
