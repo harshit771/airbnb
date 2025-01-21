@@ -112,6 +112,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     List<Inventory> findByHotelAndDateBetween(Hotel hotel, LocalDate starDate, LocalDate endDate);
 
-    List<Inventory> findByRoom(Room room);
+    List<Inventory> findByRoomOrderByDate(Room room);
 
 }

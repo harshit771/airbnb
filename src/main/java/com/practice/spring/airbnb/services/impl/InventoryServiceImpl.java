@@ -3,7 +3,9 @@ package com.practice.spring.airbnb.services.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +36,7 @@ public class InventoryServiceImpl implements InventoryService {
     private final InventoryRepository inventoryRepository;
     private final HotelMinPriceRepository minPriceRepository;
     private final RoomRepository roomRepository;
+    private ModelMapper modelMapper;
 
     @Override
     public void initializeRoomForAYear(Room room) {
@@ -84,8 +87,11 @@ public class InventoryServiceImpl implements InventoryService {
 
         if(!user.equals(room.getHotel().getOwner())) 
         throw new AccessDeniedException("You are not the owner of this inventory of room id "+roomId);
-        
-        throw new UnsupportedOperationException("Unimplemented method 'getAllInventoryByRoom'");
+
+        return inventoryRepository.findByRoomOrderByDate(room)
+                            .stream().map((element) -> modelMapper.map(element,InventoryDto.class))
+                            .collect(Collectors.toList());
+    
     }
 
     private User getCurrentUser() {
