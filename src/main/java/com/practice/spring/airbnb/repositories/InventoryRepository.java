@@ -116,7 +116,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
         List<Inventory> findByRoomOrderByDate(Room room);
 
         @Query("""
-                            Select i Inventory i
+                            Select i FROM Inventory i
                             WHERE i.room.id = :roomId
                             AND i.date BETWEEN :startDate AND :endDate
                         """)
@@ -130,7 +130,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
         @Modifying
         @Query("""
                             UPDATE Inventory i
-                            SET i.surgeFactor = :surgeFactor and i.closed = :closed;
+                            SET i.surgeFactor = :surgeFactor , i.closed = :closed
                             WHERE i.room.id = :roomId
                             AND i.date BETWEEN :startDate AND :endDate
                         """)
