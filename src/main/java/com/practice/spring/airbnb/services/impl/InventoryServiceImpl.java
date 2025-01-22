@@ -12,10 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.practice.spring.airbnb.dto.HotelPriceDto;
 import com.practice.spring.airbnb.dto.HotelSearchRequest;
 import com.practice.spring.airbnb.dto.InventoryDto;
+import com.practice.spring.airbnb.dto.UpdateInventoryRequestDto;
 import com.practice.spring.airbnb.entities.Inventory;
 import com.practice.spring.airbnb.entities.Room;
 import com.practice.spring.airbnb.entities.User;
@@ -85,17 +87,37 @@ public class InventoryServiceImpl implements InventoryService {
 
         User user = getCurrentUser();
 
-        if(!user.equals(room.getHotel().getOwner())) 
-        throw new AccessDeniedException("You are not the owner of this inventory of room id "+roomId);
+        if (!user.equals(room.getHotel().getOwner()))
+            throw new AccessDeniedException("You are not the owner of this inventory of room id " + roomId);
 
         return inventoryRepository.findByRoomOrderByDate(room)
-                            .stream().map((element) -> modelMapper.map(element,InventoryDto.class))
-                            .collect(Collectors.toList());
-    
+                .stream().map((element) -> modelMapper.map(element, InventoryDto.class))
+                .collect(Collectors.toList());
+
     }
 
     private User getCurrentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    @Override
+    @Transactional
+    public void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id " + roomId));
+
+        User user = getCurrentUser();
+
+        if (!user.equals(room.getHotel().getOwner()))
+            throw new AccessDeniedException("You are not the owner of this inventory of room id " + roomId);
+            
+        inventoryRepository.getInventoryAndLockBeforeUpdate(roomId, updateInventoryRequestDto.getStartDate(),
+                updateInventoryRequestDto.getEndDate(), updateInventoryRequestDto.getClosed(),
+                updateInventoryRequestDto.getSurgeFactor());
+
+        inventoryRepository.updateInventory(roomId, updateInventoryRequestDto.getStartDate(),
+                updateInventoryRequestDto.getEndDate(), updateInventoryRequestDto.getClosed(),
+                updateInventoryRequestDto.getSurgeFactor());
     }
 
 }

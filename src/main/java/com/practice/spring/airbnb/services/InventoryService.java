@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import com.practice.spring.airbnb.dto.HotelPriceDto;
 import com.practice.spring.airbnb.dto.HotelSearchRequest;
 import com.practice.spring.airbnb.dto.InventoryDto;
+import com.practice.spring.airbnb.dto.UpdateInventoryRequestDto;
 import com.practice.spring.airbnb.entities.Room;
 
 public interface InventoryService {
@@ -19,4 +20,6 @@ public interface InventoryService {
     Page<HotelPriceDto> searchHotels(HotelSearchRequest hotelSearchRequest);
 
     List<InventoryDto> getAllInventoryByRoom(Long roomId);
+
+    void updateInventory(Long roomId, UpdateInventoryRequestDto updateInventoryRequestDto);
 }
