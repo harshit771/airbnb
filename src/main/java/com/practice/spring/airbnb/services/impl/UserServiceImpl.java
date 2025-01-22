@@ -1,5 +1,6 @@
 package com.practice.spring.airbnb.services.impl;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.practice.spring.airbnb.dto.ProfileUpdateRequestDto;
+import com.practice.spring.airbnb.dto.UserDto;
 import com.practice.spring.airbnb.entities.User;
 import com.practice.spring.airbnb.exception.ResourceNotFoundException;
 import com.practice.spring.airbnb.repositories.UserRepository;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public User getUserId(Long id) {
@@ -56,6 +59,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         userRepository.save(user);
 
+    }
+
+    @Override
+    public UserDto getMyProfile() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return modelMapper.map(user, UserDto.class);
     }
 
 }

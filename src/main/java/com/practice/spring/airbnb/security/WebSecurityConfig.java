@@ -44,7 +44,8 @@ public class WebSecurityConfig {
                     .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                     .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/admin/**").hasRole("HOTEL_MANAGER")
-                        .requestMatchers("/booking/**").authenticated()
+                        .requestMatchers("/bookings/**").authenticated()
+                        .requestMatchers("/user/**").authenticated()
                         .anyRequest().permitAll())
                     .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandler()));    
         return httpSecurity.build();
