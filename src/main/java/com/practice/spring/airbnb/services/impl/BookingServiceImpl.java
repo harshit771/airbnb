@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -42,7 +43,6 @@ import com.stripe.model.Event;
 import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.RefundCreateParams;
-
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -246,7 +246,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id " + hotelId));
         User user = getCurrentUser();
 
-        if (user.equals(hotel.getOwner())) {
+        if (!user.equals(hotel.getOwner())) {
             throw new UnAuthorizeException("You are not owner of the hotel with id" + hotelId);
         }
 
@@ -289,6 +289,15 @@ public class BookingServiceImpl implements BookingService {
                 : totalRevenueofConfirmedBooking.divide(BigDecimal.valueOf(totalConfirmBooking), RoundingMode.HALF_UP);
 
         return new HotelReportDto(totalConfirmBooking, totalRevenueofConfirmedBooking, avrgRevenue);
+    }
+
+    @Override
+    public List<BookingDto> getMyBooking() {
+        User user = getCurrentUser();
+
+        return bookingRepository.getByUser(user)
+                .stream().map((u) -> modelMapper.map(u, BookingDto.class))
+                .collect(Collectors.toList());
     }
 
 }
