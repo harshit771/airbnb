@@ -253,7 +253,7 @@ public class BookingServiceImpl implements BookingService {
         log.info("Getting booking with hotel id " + hotelId);
 
         List<Booking> bookings = bookingRepository.findByHotel(hotel);
-
+        log.info("booking gets "+bookings.size());
         return bookings.stream()
                 .map((booking) -> modelMapper.map(booking, BookingDto.class))
                 .collect(Collectors.toList());
